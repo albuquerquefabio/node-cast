@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "node-cast": {
+      "type": "application",
+      "root": "apps/node-cast",
+      "sourceRoot": "apps/node-cast/src",
+      "projectType": "nest"
+    },
+    "client": {
+      "type": "application",
+      "root": "apps/client",
+      "sourceRoot": "apps/client/src",
+      "projectType": "react"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "monorepo": true,
+  "root": "apps/node-cast-source",
+  "sourceRoot": "apps/node-cast-source/src",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/node-cast-source/tsconfig.app.json"
+  },
+  "projects": {
+    "node-cast-source": {
+      "type": "application",
+      "root": "apps/node-cast-source",
+      "entryFile": "main",
+      "sourceRoot": "apps/node-cast-source/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/node-cast-source/tsconfig.app.json"
+      }
+    }
+  }
+}
