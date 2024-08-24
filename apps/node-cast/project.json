@@ -1,0 +1,26 @@
+{
+  "name": "node-cast",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/node-cast/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "node-cast:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "node-cast:build:development"
+        },
+        "production": {
+          "buildTarget": "node-cast:build:production"
+        }
+      }
+    }
+  }
+}
