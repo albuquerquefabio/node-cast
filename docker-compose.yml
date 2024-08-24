@@ -1,0 +1,20 @@
+services:
+  backend:
+    container_name: node-cast-api
+    restart: always
+    ports:
+      - '3000:3000'
+    build:
+      context: ./
+      dockerfile: ./apps/node-cast/DockerFile.dev
+
+  frontend:
+    container_name: node-cast-web
+    restart: always
+    ports:
+      - '3001:80'
+    depends_on:
+      - backend
+    build:
+      context: ./
+      dockerfile: ./apps/client/DockerFile.dev

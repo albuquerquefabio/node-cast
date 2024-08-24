@@ -1,0 +1,29 @@
+FROM node:20-alpine as builder
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
+RUN npm install --only=development
+
+COPY . . /usr/src/app/
+
+RUN npx nx build node-cast --prod
+
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
+RUN npm install -g pm2@latest
+
+RUN npm install --only=production
+
+COPY --from=builder /usr/src/app/dist/apps/node-cast ./build
+
+ENTRYPOINT ["pm2-runtime", "build/main.js"]

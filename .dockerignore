@@ -1,0 +1,9 @@
+node_modules
+.git
+.husky
+.env*
+**/.env*
+**/dist
+**/build
+**/log/*.log
+**/nginx
