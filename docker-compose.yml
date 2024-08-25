@@ -1,9 +1,21 @@
 services:
+  db:
+    # postrges
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    volumes:
+      - ./.postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   backend:
     container_name: node-cast-api
     restart: always
     ports:
       - '3000:3000'
+    depends_on:
+      - db
     build:
       context: ./
       dockerfile: ./apps/node-cast/DockerFile.dev
