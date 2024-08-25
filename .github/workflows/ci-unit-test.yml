@@ -25,6 +25,11 @@ jobs:
         with:
           node-version: '18'
           cache: 'yarn'
+      - name: Install dependencies
+        run: yarn
+
+      - name: Ensure npm cache directory exists
+        run: mkdir -p ~/.npm
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -33,9 +38,6 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: yarn
 
   unit-test:
     runs-on: ubuntu-latest
@@ -53,6 +55,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn
+
+      - name: Ensure npm cache directory exists
+        run: mkdir -p ~/.npm
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -61,9 +69,6 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: yarn
 
       - name: Check ${{ matrix.command }} lint
         run: yarn nx test ${{ matrix.command}}
