@@ -5,6 +5,7 @@ import { UsersController } from '../users/users.controller';
 import { UsersService } from '../users/users.service';
 import { DatabaseModule } from '../shared/database.module';
 import { EntityProviders } from '../util/entities/entity.providers';
+import { AppCacheModule } from '../cache/cache.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { EntityProviders } from '../util/entities/entity.providers';
     }),
     DatabaseModule,
     EntityProviders,
+    AppCacheModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],
