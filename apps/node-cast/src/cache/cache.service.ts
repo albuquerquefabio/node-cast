@@ -1,25 +1,38 @@
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
-import { ttl, ttlSecToMs } from './cache-constants';
+import { ttlSecToMs } from './cache-constants';
+import { ICacheService } from './interface/cache.interface';
+import { hasObject } from '../util/utility';
 
 @Injectable()
-export class CacheService {
+export class CacheService implements ICacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  async retrieveData(bearer: string): Promise<string> {
-    const value = await this.cacheManager.get<{ access_token?: string }>(
-      bearer
-    );
-    return value?.access_token || null;
+  async createData<T>(
+    key: string,
+    value: T,
+    ttlInSeconds?: number
+  ): Promise<void> {
+    const ttlMs = ttlInSeconds ? ttlSecToMs(ttlInSeconds) : undefined;
+    await this.cacheManager.set(key, value, ttlMs);
   }
 
-  async storeData(bearer: string): Promise<void> {
-    await this.cacheManager.set(
-      bearer,
-      {
-        access_token: bearer,
-      },
-      ttlSecToMs(ttl.hour)
-    );
+  async readData<T>(key: string): Promise<T> {
+    const value = await this.cacheManager.get<T>(key);
+    if (hasObject(value)) return value;
+    return null;
+  }
+
+  async updateData<T>(
+    key: string,
+    value: T,
+    ttlInSeconds?: number
+  ): Promise<void> {
+    const ttlMs = ttlInSeconds ? ttlSecToMs(ttlInSeconds) : undefined;
+    await this.cacheManager.set(key, value, ttlMs);
+  }
+
+  async deleteData(key: string): Promise<void> {
+    await this.cacheManager.del(key);
   }
 }

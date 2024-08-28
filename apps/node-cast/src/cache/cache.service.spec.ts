@@ -29,7 +29,24 @@ describe('CacheService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('retrieveData', () => {
+  describe('createData', () => {
+    it('should store access_token with ttl', async () => {
+      const bearer = 'testBearer';
+      const ttlInSeconds = ttl.hour;
+      const ttlMs = ttlSecToMs(ttlInSeconds);
+      jest.spyOn(cacheManager, 'set').mockResolvedValue(undefined);
+
+      await service.createData(bearer, { access_token: bearer }, ttlInSeconds);
+
+      expect(cacheManager.set).toHaveBeenCalledWith(
+        bearer,
+        { access_token: bearer },
+        ttlMs
+      );
+    });
+  });
+
+  describe('readData', () => {
     it('should return access_token if present', async () => {
       const bearer = 'testBearer';
       const accessToken = 'testAccessToken';
@@ -37,8 +54,8 @@ describe('CacheService', () => {
         .spyOn(cacheManager, 'get')
         .mockResolvedValue({ access_token: accessToken });
 
-      const result = await service.retrieveData(bearer);
-      expect(result).toBe(accessToken);
+      const result = await service.readData<{ access_token: string }>(bearer);
+      expect(result).toStrictEqual({ access_token: accessToken });
       expect(cacheManager.get).toHaveBeenCalledWith(bearer);
     });
 
@@ -46,24 +63,9 @@ describe('CacheService', () => {
       const bearer = 'testBearer';
       jest.spyOn(cacheManager, 'get').mockResolvedValue({});
 
-      const result = await service.retrieveData(bearer);
+      const result = await service.readData(bearer);
       expect(result).toBeNull();
       expect(cacheManager.get).toHaveBeenCalledWith(bearer);
-    });
-  });
-
-  describe('storeData', () => {
-    it('should store access_token with ttl', async () => {
-      const bearer = 'testBearer';
-      const ttlMs = ttlSecToMs(ttl.hour);
-      jest.spyOn(cacheManager, 'set').mockResolvedValue(undefined);
-
-      await service.storeData(bearer);
-      expect(cacheManager.set).toHaveBeenCalledWith(
-        bearer,
-        { access_token: bearer },
-        ttlMs
-      );
     });
   });
 });

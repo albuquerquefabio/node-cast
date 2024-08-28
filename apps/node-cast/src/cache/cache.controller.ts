@@ -1,17 +1,14 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { CacheService } from './cache.service';
 
 @Controller('cache')
 export class CacheController {
   constructor(private readonly cacheService: CacheService) {}
 
-  @Get()
-  async find() {
-    return 'true';
-  }
+  @Get(':key')
+  async read(@Param('key') key: string) {
+    const data = await this.cacheService.readData(key);
 
-  @Post()
-  async store() {
-    return 'true';
+    return data;
   }
 }

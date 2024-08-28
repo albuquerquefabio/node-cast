@@ -13,8 +13,9 @@ describe('CacheController', () => {
         {
           provide: CacheService,
           useValue: {
-            find: jest.fn().mockResolvedValue('true'),
-            store: jest.fn().mockResolvedValue('true'),
+            readData: jest
+              .fn()
+              .mockResolvedValue({ access_token: 'testAccessToken' }),
           },
         },
       ],
@@ -28,19 +29,12 @@ describe('CacheController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('find', () => {
+  describe('read', () => {
     it('should return true', async () => {
-      const result = await controller.find();
-      expect(result).toBe('true');
-      expect(service.retrieveData).toHaveBeenCalled();
-    });
-  });
-
-  describe('store', () => {
-    it('should return true', async () => {
-      const result = await controller.store();
-      expect(result).toBe('true');
-      expect(service.storeData).toHaveBeenCalled();
+      const key = 'testKey';
+      const result = await controller.read(key);
+      expect(result).toStrictEqual({ access_token: 'testAccessToken' });
+      expect(service.readData).toHaveBeenCalledWith(key);
     });
   });
 });
