@@ -22,9 +22,9 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_DB: ${{ secrets.POSTGRES.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
         options: >-
           --health-cmd="pg_isready -U ${{ vars.POSTGRES_USER }}"
           --health-interval=10s
@@ -34,11 +34,7 @@ jobs:
         image: redis:alpine
         ports:
           - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=15s
-          --health-timeout=10s
-          --health-retries=10
+        options: --entrypoint redis-server
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
