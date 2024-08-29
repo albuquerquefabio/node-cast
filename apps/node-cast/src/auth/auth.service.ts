@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-// import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { CacheService } from '../cache/cache.service';
 import { ttl } from '../cache/cache-constants';
