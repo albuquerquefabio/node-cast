@@ -25,6 +25,7 @@ jobs:
           POSTGRES_DB: ${{ vars.POSTGRES_DB }}
           POSTGRES_USER: ${{ vars.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
         options: >-
           --health-cmd="pg_isready -U ${{ vars.POSTGRES_USER }}"
           --health-interval=10s
@@ -94,6 +95,6 @@ jobs:
           POSTGRES_DB: ${{ vars.POSTGRES_DB }}
           POSTGRES_USER: ${{ vars.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
           POSTGRES_PORT: 5432
         run: yarn nx test ${{ matrix.command}}
