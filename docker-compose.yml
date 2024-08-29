@@ -9,6 +9,11 @@ services:
     volumes:
       - ./.postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+
   backend:
     container_name: node-cast-api
     restart: always
@@ -16,6 +21,7 @@ services:
       - '3000:3000'
     depends_on:
       - db
+      - redis
     build:
       context: ./
       dockerfile: ./apps/node-cast/DockerFile.dev
