@@ -25,11 +25,11 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES.POSTGRES_DB }}
           POSTGRES_USER: ${{ secrets.POSTGRES.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES.POSTGRES_PASSWORD }}
-        # options: >-
-        #   # --health-cmd="pg_isready -U ${{ secrets.POSTGRES.POSTGRES_USER }}"
-        #   --health-interval=10s
-        #   --health-timeout=5s
-        #   --health-retries=5
+        options: >-
+          --health-cmd="pg_isready -U ${{ vars.POSTGRES_USER }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
       redis:
         image: redis:alpine
         ports:
@@ -108,4 +108,10 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Check ${{ matrix.command }} lint
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
         run: yarn nx test ${{ matrix.command}}
