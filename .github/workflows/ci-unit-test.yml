@@ -62,12 +62,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until pg_isready -h localhost -p 5432 -U ${{ secrets.POSTGRES.POSTGRES_USER }}; do
-            echo "Waiting for PostgreSQL to be ready..."
-            sleep 1
-          done
+      # - name: Wait for PostgreSQL to be ready
+      #   run: |
+      #     until pg_isready -h localhost -p 5432 -U ${{ secrets.POSTGRES.POSTGRES_USER }}; do
+      #       echo "Waiting for PostgreSQL to be ready..."
+      #       sleep 1
+      #     done
 
       - name: Wait for Redis to be ready
         run: |
