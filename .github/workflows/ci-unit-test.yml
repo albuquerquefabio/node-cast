@@ -6,6 +6,13 @@ on:
       - main
   pull_request:
     branches: '**'
+  workflow_dispatch:
+
+env:
+  POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+  POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+  POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
 
 permissions:
   actions: read
@@ -22,14 +29,15 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
         options: >-
-          --health-cmd="pg_isready -U ${{ vars.POSTGRES_USER }}"
+          --health-cmd="pg_isready -U ${{ env.POSTGRES_USER }}"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
       redis:
         image: redis
         ports:
@@ -91,9 +99,9 @@ jobs:
 
       - name: Check ${{ matrix.command }} lint
         env:
-          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
-          POSTGRES_HOST: localhost
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
           POSTGRES_PORT: 5432
         run: yarn nx test ${{ matrix.command}}

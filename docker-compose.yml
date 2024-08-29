@@ -5,7 +5,7 @@ services:
     ports:
       - '5432:5432'
     env_file:
-      - .env
+      - .env.docker
     volumes:
       - ./.postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -23,7 +23,7 @@ services:
       - db
       - redis
     env_file:
-      - .env
+      - .env.docker
     build:
       context: ./
       dockerfile: ./apps/node-cast/DockerFile.dev
