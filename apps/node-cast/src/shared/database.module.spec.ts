@@ -11,7 +11,7 @@ describe('DatabaseModule', () => {
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
-          envFilePath: '.env',
+          // envFilePath: '.env',
         }),
         TypeOrmModule.forRoot({
           type: 'postgres',
