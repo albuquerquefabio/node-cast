@@ -38,3 +38,7 @@ services:
     build:
       context: ./
       dockerfile: ./apps/client/DockerFile.dev
+
+networks:
+  compose-network:
+    driver: bridge

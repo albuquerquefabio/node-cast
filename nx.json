@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
@@ -12,7 +15,9 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml"
+    ]
   },
   "nxCloudAccessToken": "OWEwODY4MmQtOTQ1YS00NzY1LWE4NWQtYWUzMGQxMDU5NWNifHJlYWQtd3JpdGU=",
   "plugins": [
@@ -35,7 +40,9 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/node-cast-e2e/**/*"]
+      "exclude": [
+        "apps/node-cast-e2e/**/*"
+      ]
     },
     {
       "plugin": "@nx/vite/plugin",
@@ -56,7 +63,9 @@
   ],
   "targetDefaults": {
     "e2e-ci--**/*": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     }
   },
   "generators": {
@@ -65,6 +74,21 @@
       "linter": "eslint",
       "unitTestRunner": "jest",
       "e2eTestRunner": "playwright"
+    },
+    "@nx/react": {
+      "application": {
+        "babel": true,
+        "style": "tailwind",
+        "linter": "eslint",
+        "bundler": "vite"
+      },
+      "component": {
+        "style": "tailwind"
+      },
+      "library": {
+        "style": "tailwind",
+        "linter": "eslint"
+      }
     }
   }
 }
