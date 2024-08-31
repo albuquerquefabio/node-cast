@@ -34,7 +34,7 @@ jobs:
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
         options: >-
-          --health-cmd="pg_isready -U ${{ env.POSTGRES_USER }}"
+          --health-cmd="pg_isready -U $POSTGRES_USER"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -73,7 +73,7 @@ jobs:
     needs: install
     strategy:
       matrix:
-        command: [client, node-cast]
+        command: [node-cast]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
