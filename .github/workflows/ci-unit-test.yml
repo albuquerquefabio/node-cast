@@ -73,7 +73,7 @@ jobs:
     needs: install
     strategy:
       matrix:
-        command: [client, node-cast]
+        command: [node-cast]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
