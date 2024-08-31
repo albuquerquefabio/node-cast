@@ -15,4 +15,14 @@ export class ApiService implements IApiService {
     localStorage.setItem('authToken', data.access_token);
     return data;
   }
+  async getUserData<T>() {
+    try {
+      const { data } = await axios.get<T>(`${API_BASE_URL}/v1/api/auth/me`);
+      return data;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      localStorage.removeItem('authToken');
+      throw error;
+    }
+  }
 }
