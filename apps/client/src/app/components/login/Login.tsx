@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApi } from '../../context/ApiContext';
 import Brand from '../brand/Brand';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
 export function Login() {
   const apiService = useApi();
@@ -9,11 +10,13 @@ export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { fetchUser } = useUser();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
       await apiService.login(username, password);
+      await fetchUser();
       navigate('/panel');
     } catch (err: unknown) {
       if (err instanceof Error) {
