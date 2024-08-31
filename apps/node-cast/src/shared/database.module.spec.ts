@@ -1,10 +1,12 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseModule } from './database.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getDataSourceToken, TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 describe('DatabaseModule', () => {
   let module: TestingModule;
+  let dataSource: DataSource;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -26,7 +28,15 @@ describe('DatabaseModule', () => {
         DatabaseModule,
       ],
     }).compile();
+
+    dataSource = module.get<DataSource>(getDataSourceToken());
   }, 10000);
+
+  afterAll(async () => {
+    if (dataSource.isInitialized) {
+      await dataSource.destroy();
+    }
+  });
 
   it('should be defined', () => {
     expect(module).toBeDefined();

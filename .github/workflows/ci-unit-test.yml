@@ -97,11 +97,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Check ${{ matrix.command }} lint
+      - name: Check ${{ matrix.command }}
         env:
           POSTGRES_DB: ${{ env.POSTGRES_DB }}
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
           POSTGRES_PORT: 5432
-        run: yarn nx test ${{ matrix.command}}
+        run: yarn nx test ${{ matrix.command}} --detectOpenHandles
