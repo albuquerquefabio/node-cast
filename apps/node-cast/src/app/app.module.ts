@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
+import { HandlerGateway } from '../gateways/handler.gateway';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,6 +20,7 @@ import { UsersModule } from '../users/users.module';
     EntityProviders,
     AuthModule,
     AppCacheModule,
+    HandlerGateway,
   ],
   providers: [
     {
