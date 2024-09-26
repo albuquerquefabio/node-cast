@@ -12,7 +12,7 @@ import { UserRoles } from '../interfaces/users.interface';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   @IsNotEmpty()

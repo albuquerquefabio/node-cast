@@ -14,6 +14,6 @@ export interface IUsersService {
     id: string,
     select?: Partial<Record<keyof User, boolean>>
   ): Promise<Partial<User>>;
-  update(id: string, updateUserDto: UpdateUserDto): Promise<User>;
-  delete(id: string): Promise<void>;
+  update(id: number, updateUserDto: UpdateUserDto): Promise<User>;
+  delete(id: number): Promise<void>;
 }

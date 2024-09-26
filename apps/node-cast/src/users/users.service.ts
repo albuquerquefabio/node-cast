@@ -54,7 +54,7 @@ export class UsersService implements IUsersService {
   ): Promise<Partial<User>> {
     return this.usersRepository.findOne({
       where: [
-        ...(!isNaN(+id) ? [{ id, status: true }] : []),
+        ...(!isNaN(+id) ? [{ id: +id, status: true }] : []),
         { username: id, status: true },
         { email: id, status: true },
       ],
@@ -62,7 +62,7 @@ export class UsersService implements IUsersService {
     });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { id } });
 
     if (!user) throw new NotFoundException('User not found.');
@@ -80,7 +80,7 @@ export class UsersService implements IUsersService {
     return await this.usersRepository.save(user);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     const user = await this.usersRepository.findOne({
       where: { id },
       select: { id: true },
