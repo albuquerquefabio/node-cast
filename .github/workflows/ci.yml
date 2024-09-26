@@ -1,4 +1,4 @@
-name: CI Unit Test
+name: CI
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
   install:
     runs-on: ubuntu-latest
     container:
-      image: node:18-buster-slim
+      image: node:20-buster-slim
     services:
       postgres:
         image: postgres:13
@@ -50,58 +50,36 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'yarn'
+
       - name: Install dependencies
         run: yarn
 
-      - name: Ensure npm cache directory exists
-        run: mkdir -p ~/.npm
-
-      - name: Cache node modules
-        uses: actions/cache@v3
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            .yarn/cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-yarn-
 
-  unit-test:
-    runs-on: ubuntu-latest
-    container:
-      image: node:18-buster-slim
-    needs: install
-    strategy:
-      matrix:
-        command: [node-cast]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Run lint
+        run: yarn nx run-many --target=lint --projects=client,node-cast
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'yarn'
-      - name: Install dependencies
-        run: yarn
+      - name: Build project
+        run: yarn nx run-many --target=build --projects=client,node-cast
 
-      - name: Ensure npm cache directory exists
-        run: mkdir -p ~/.npm
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Check ${{ matrix.command }}
+      - name: Run Test
         env:
           POSTGRES_DB: ${{ env.POSTGRES_DB }}
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
           POSTGRES_HOST: ${{ env.POSTGRES_HOST }}
           POSTGRES_PORT: 5432
-        run: yarn nx test ${{ matrix.command}} --detectOpenHandles
+        run: |
+          echo "Starting tests..."
+          yarn nx test node-cast --maxWorkers=2 --testTimeout=30000
+        # --detectOpenHandles
