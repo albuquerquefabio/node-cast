@@ -12,7 +12,7 @@ env:
   POSTGRES_DB: ${{ vars.POSTGRES_DB }}
   POSTGRES_USER: ${{ vars.POSTGRES_USER }}
   POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
-  POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
+  POSTGRES_HOST: 127.0.0.1
 
 permissions:
   actions: read
@@ -23,9 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:20-buster-slim
+      options: --privileged
     services:
       postgres:
-        image: postgres:13
+        image: postgres:15
         ports:
           - 5432:5432
         env:
@@ -82,3 +83,4 @@ jobs:
         run: |
           echo "Starting tests..."
           yarn nx test node-cast --maxWorkers=2 --testTimeout=30000
+          #--maxWorkers=2 --testTimeout=30000
