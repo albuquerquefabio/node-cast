@@ -81,4 +81,4 @@ jobs:
           POSTGRES_PORT: 5432
         run: |
           echo "Starting tests..."
-          yarn nx test node-cast --maxWorkers=2 --testTimeout=30000 --detectOpenHandles
+          yarn nx test node-cast --maxWorkers=2 --testTimeout=30000

@@ -30,7 +30,8 @@ describe('DatabaseModule', () => {
     }).compile();
 
     dataSource = module.get<DataSource>(getDataSourceToken());
-  }, 5000);
+    await dataSource.initialize();
+  });
 
   afterAll(async () => {
     if (dataSource.isInitialized) {
