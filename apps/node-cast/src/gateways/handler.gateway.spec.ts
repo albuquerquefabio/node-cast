@@ -36,10 +36,6 @@ describe('HandlerGateway', () => {
     ioClient.connect();
     ioClient.emit('ping', { message: 'Hello world!' });
     await new Promise<void>((resolve, reject) => {
-      ioClient.on('connect', () => {
-        console.log('connected');
-      });
-      // ioClient.on('disconnected', () => console.log('disconnected'));
       ioClient.on('pong', (data) => {
         try {
           expect(data).toStrictEqual({
