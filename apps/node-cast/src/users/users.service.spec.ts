@@ -18,7 +18,7 @@ describe('UsersService', () => {
   let repository: Repository<User>;
   let usersRepo: UsersRepository;
   let user: User;
-  const id = Date.now().toString();
+  const id = Date.now();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -111,7 +111,7 @@ describe('UsersService', () => {
     it('should return a user by id', async () => {
       jest.spyOn(repository, 'findOne').mockResolvedValue(user);
 
-      expect(await service.findOne(id)).toEqual(user);
+      expect(await service.findOne(String(id))).toEqual(user);
     });
 
     it('should throw an error if user is not found', async () => {
@@ -119,7 +119,7 @@ describe('UsersService', () => {
         .spyOn(repository, 'findOne')
         .mockRejectedValue(new Error('User not found'));
 
-      expect(service.findOne(id)).rejects.toThrow('User not found');
+      expect(service.findOne(String(id))).rejects.toThrow('User not found');
     });
   });
 
@@ -137,7 +137,7 @@ describe('UsersService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPassword');
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const { password } = await service.findOne(user.id);
+      const { password } = await service.findOne(String(user.id));
 
       const result = await service.update(user.id, {
         password: userData.password,
@@ -203,7 +203,7 @@ describe('UsersService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
       jest.spyOn(repository, 'save').mockImplementation();
 
-      const { password } = await service.findOne(user.id);
+      const { password } = await service.findOne(String(user.id));
 
       await expect(
         service.update(user.id, {

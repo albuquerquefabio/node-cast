@@ -16,6 +16,11 @@ describe('CacheService', () => {
           useValue: {
             get: jest.fn(),
             set: jest.fn(),
+            del: jest.fn(),
+            store: {
+              keys: jest.fn(),
+              mget: jest.fn(),
+            },
           },
         },
       ],
@@ -66,6 +71,87 @@ describe('CacheService', () => {
       const result = await service.readData(bearer);
       expect(result).toBeNull();
       expect(cacheManager.get).toHaveBeenCalledWith(bearer);
+    });
+  });
+
+  describe('readDataByPattern', () => {
+    it('should return an array of values matching the pattern', async () => {
+      const pattern = 'test*';
+      const keys = ['test1', 'test2'];
+      const values = [{ access_token: 'token1' }, { access_token: 'token2' }];
+      jest.spyOn(cacheManager.store, 'keys').mockResolvedValue(keys);
+      jest.spyOn(cacheManager.store, 'mget').mockResolvedValue(values);
+
+      const result = await service.readDataByPattern<{ access_token: string }>(
+        pattern
+      );
+
+      expect(result).toStrictEqual(values);
+      expect(cacheManager.store.keys).toHaveBeenCalledWith(pattern);
+      expect(cacheManager.store.mget).toHaveBeenCalledWith(...keys);
+    });
+
+    it('should return null if no keys match the pattern', async () => {
+      const pattern = 'test*';
+      jest.spyOn(cacheManager.store, 'keys').mockResolvedValue([]);
+
+      const result = await service.readDataByPattern<{ access_token: string }>(
+        pattern
+      );
+
+      expect(result).toBeNull();
+      expect(cacheManager.store.keys).toHaveBeenCalledWith(pattern);
+    });
+
+    it('should filter out null values', async () => {
+      const pattern = 'test*';
+      const keys = ['test1', 'test2'];
+      const values = [{ access_token: 'token1' }, null];
+      jest.spyOn(cacheManager.store, 'keys').mockResolvedValue(keys);
+      jest.spyOn(cacheManager.store, 'mget').mockResolvedValue(values);
+
+      const result = await service.readDataByPattern<{ access_token: string }>(
+        pattern
+      );
+
+      expect(result).toStrictEqual([{ access_token: 'token1' }]);
+      expect(cacheManager.store.keys).toHaveBeenCalledWith(pattern);
+      expect(cacheManager.store.mget).toHaveBeenCalledWith(...keys);
+    });
+  });
+
+  describe('updateData', () => {
+    it('should update data with ttl', async () => {
+      const key = 'testKey';
+      const value = { access_token: 'newToken' };
+      const ttlInSeconds = ttl.hour;
+      const ttlMs = ttlSecToMs(ttlInSeconds);
+      jest.spyOn(cacheManager, 'set').mockResolvedValue(undefined);
+
+      await service.updateData(key, value, ttlInSeconds);
+
+      expect(cacheManager.set).toHaveBeenCalledWith(key, value, ttlMs);
+    });
+
+    it('should update data without ttl', async () => {
+      const key = 'testKey';
+      const value = { access_token: 'newToken' };
+      jest.spyOn(cacheManager, 'set').mockResolvedValue(undefined);
+
+      await service.updateData(key, value);
+
+      expect(cacheManager.set).toHaveBeenCalledWith(key, value, undefined);
+    });
+  });
+
+  describe('deleteData', () => {
+    it('should delete data', async () => {
+      const key = 'testKey';
+      jest.spyOn(cacheManager, 'del').mockResolvedValue(undefined);
+
+      await service.deleteData(key);
+
+      expect(cacheManager.del).toHaveBeenCalledWith(key);
     });
   });
 });

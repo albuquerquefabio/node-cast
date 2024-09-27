@@ -3,9 +3,10 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CacheService } from '../cache/cache.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { UserRoles } from '../users/interfaces/users.interface';
 
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
@@ -32,12 +33,14 @@ describe('AuthService', () => {
           provide: JwtService,
           useValue: {
             signAsync: jest.fn(),
+            verifyAsync: jest.fn(),
           },
         },
         {
           provide: CacheService,
           useValue: {
             createData: jest.fn(),
+            deleteData: jest.fn(),
           },
         },
       ],
@@ -48,7 +51,7 @@ describe('AuthService', () => {
     jwtService = module.get<JwtService>(JwtService);
     cacheService = module.get<CacheService>(CacheService);
     user = {
-      id: '1',
+      id: 1,
       username: 'testuser',
       name: 'Test User',
       email: 'test@example.com',
@@ -56,7 +59,7 @@ describe('AuthService', () => {
       status: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-      roles: [],
+      roles: [UserRoles.USER],
     };
   });
 
@@ -75,10 +78,11 @@ describe('AuthService', () => {
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         username: 'testuser',
         name: 'Test User',
-        id: '1',
+        id: 1,
+        roles: [UserRoles.USER],
       });
       expect(cacheService.createData).toHaveBeenCalledWith(
-        'token',
+        `#Session-${user.id}:token`,
         { access_token: 'token' },
         expect.any(Number)
       );
@@ -114,14 +118,14 @@ describe('AuthService', () => {
       const result = await service['validateUser']('testuser', 'password');
 
       expect(result).toEqual({
-        id: '1',
+        id: 1,
         username: 'testuser',
         name: 'Test User',
         email: 'test@example.com',
         status: true,
         createdAt: expect.any(Date),
         updatedAt: expect.any(Date),
-        roles: [],
+        roles: [UserRoles.USER],
       });
     });
 
@@ -146,14 +150,14 @@ describe('AuthService', () => {
   describe('generateToken', () => {
     it('should generate a JWT token', async () => {
       const user = {
-        id: '1',
+        id: 1,
         username: 'testuser',
         name: 'Test User',
         email: 'test@example.com',
         status: true,
         createdAt: new Date(),
         updatedAt: new Date(),
-        roles: [],
+        roles: [UserRoles.USER],
       };
 
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('token');
@@ -164,7 +168,8 @@ describe('AuthService', () => {
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         username: 'testuser',
         name: 'Test User',
-        id: '1',
+        id: 1,
+        roles: [UserRoles.USER],
       });
     });
   });
@@ -173,12 +178,50 @@ describe('AuthService', () => {
     it('should store the token in cache', async () => {
       jest.spyOn(cacheService, 'createData').mockResolvedValue(undefined);
 
-      await service['storeToken']('token');
+      await service['storeToken'](user.id, 'token');
 
       expect(cacheService.createData).toHaveBeenCalledWith(
-        'token',
+        `#Session-${user.id}:token`,
         { access_token: 'token' },
         expect.any(Number)
+      );
+    });
+  });
+
+  describe('signOut', () => {
+    it('should call doubleCheck and deleteData with correct arguments', async () => {
+      const token = 'Bearer validtoken';
+      const userId = 1;
+
+      (jwtService.verifyAsync as jest.Mock).mockResolvedValue({ id: userId });
+      (cacheService.deleteData as jest.Mock).mockResolvedValue(undefined);
+
+      await service.signOut(token, userId);
+
+      expect(jwtService.verifyAsync).toHaveBeenCalledWith('validtoken', {
+        secret: 'very_secret_code_GOES_HERE',
+      });
+
+      expect(cacheService.deleteData).toHaveBeenCalledWith('validtoken');
+    });
+
+    it('should throw BadRequestException when token or userId is empty', async () => {
+      await expect(service.signOut('', 1)).rejects.toThrow(BadRequestException);
+      await expect(service.signOut('Bearer validtoken', null)).rejects.toThrow(
+        BadRequestException
+      );
+    });
+
+    it('should throw UnauthorizedException for invalid token', async () => {
+      const token = 'Bearer invalidtoken';
+      const userId = 1;
+
+      await expect(service['doubleCheck'](token, userId)).rejects.toThrow(
+        UnauthorizedException
+      );
+
+      await expect(service.signOut(token, userId)).rejects.toThrow(
+        UnauthorizedException
       );
     });
   });
