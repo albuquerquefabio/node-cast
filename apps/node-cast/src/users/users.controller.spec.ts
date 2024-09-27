@@ -31,7 +31,7 @@ describe('UsersController', () => {
     controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);
     user = {
-      id: '1',
+      id: 1,
       name: 'Jack Daniel',
       username: 'jackdaniel',
       email: 'jack.daniel@example.com',
@@ -70,7 +70,7 @@ describe('UsersController', () => {
       };
 
       const user: User = {
-        id: '1',
+        id: 1,
         ...createUserDto,
         status: true,
         createdAt: new Date(),
@@ -100,12 +100,12 @@ describe('UsersController', () => {
 
       const updatedUser: User = {
         ...user,
-        id: '1',
+        id: 1,
         username: 'newUsername',
       };
       jest.spyOn(service, 'update').mockResolvedValue(updatedUser);
 
-      const req = { user: { id: '1' } };
+      const req = { user: { id: 1 } };
       expect(await controller.update(updateUserDto, req)).toEqual(updatedUser);
     });
   });
@@ -114,7 +114,7 @@ describe('UsersController', () => {
     it('should delete a user', async () => {
       jest.spyOn(service, 'delete').mockResolvedValue(undefined);
 
-      const req = { user: { id: '1' } };
+      const req = { user: { id: 1 } };
       expect(await controller.delete(req)).toEqual({
         message: 'Done',
         status: true,

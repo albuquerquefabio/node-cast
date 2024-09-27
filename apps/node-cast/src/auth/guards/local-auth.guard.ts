@@ -29,15 +29,17 @@ export class LocalAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) throw new UnauthorizedException();
-
-    const redisToken = await this.getRedisToken(token);
-
-    if (!redisToken) throw new UnauthorizedException();
-
     try {
-      const payload = await this.verifyToken(redisToken);
+      const payload = await this.verifyToken(token);
+      if (!payload) throw new UnauthorizedException();
 
-      request['user'] = payload;
+      const redisToken = await this.verifyToken(
+        await this.getRedisToken(payload.id, token)
+      );
+
+      if (!redisToken) throw new UnauthorizedException();
+
+      request['user'] = redisToken;
     } catch (error) {
       throw new UnauthorizedException();
     }
@@ -50,16 +52,19 @@ export class LocalAuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 
-  private async getRedisToken(token: string): Promise<string> {
+  private async getRedisToken(
+    key: string | number,
+    token: string
+  ): Promise<string> {
     const { access_token } = await this.redisCache.readData<{
       access_token: string;
-    }>(token);
+    }>(`#Session-${key}:${token}`);
     return access_token;
   }
 
   private async verifyToken(
     token: string
-  ): Promise<Pick<User, 'username' | 'email' | 'id'>> {
+  ): Promise<Pick<User, 'username' | 'email' | 'id' | 'roles'>> {
     try {
       return await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
