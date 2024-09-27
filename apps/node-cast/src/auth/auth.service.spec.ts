@@ -199,7 +199,7 @@ describe('AuthService', () => {
       await service.signOut(token, userId);
 
       expect(jwtService.verifyAsync).toHaveBeenCalledWith('validtoken', {
-        secret: 'very_secret_code_GOES_HERE',
+        secret: 'Very Secret',
       });
 
       expect(cacheService.deleteData).toHaveBeenCalledWith('validtoken');
