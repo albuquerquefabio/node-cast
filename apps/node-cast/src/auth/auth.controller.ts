@@ -1,18 +1,17 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Post,
   Request,
-  UseGuards,
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { Public } from './constants/auth-constants';
 import { AuthDto } from './dto/auth.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -25,9 +24,16 @@ export class AuthController {
     return await this.authService.signIn(auth.username, auth.password);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Get('me')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Delete('/logout')
+  async logout(@Request() req) {
+    return await this.authService.signOut(
+      req.headers.authorization,
+      req.user.id
+    );
   }
 }
