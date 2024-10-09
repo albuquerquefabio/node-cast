@@ -9,6 +9,8 @@ import { LocalAuthGuard } from '../auth/guards/local-auth.guard';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { HandlerGateway } from '../gateways/handler.gateway';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,7 +24,9 @@ import { HandlerGateway } from '../gateways/handler.gateway';
     AppCacheModule,
     HandlerGateway,
   ],
+  controllers: [AppController],
   providers: [
+    AppService,
     {
       provide: APP_GUARD,
       useClass: LocalAuthGuard,
