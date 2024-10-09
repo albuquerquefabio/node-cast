@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nx run-many --target=serve --parallel=2 --projects=client,node-cast"
+    "start": "nx run-many --target=serve --parallel=2 --projects=client,node-cast",
+    "build:front": "nx build client --prod",
+    "build:back": "nx build node-cast --prod"
   },
   "private": true,
   "dependencies": {
